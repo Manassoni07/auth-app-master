@@ -24,6 +24,7 @@ export default function AuthPage() {
 
   const [isLogin, setIsLogin] = useState(true);
   const [errors, setErrors] = useState<Partial<FormData>>({});
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const toggleLoginMode = () => {
     setIsLogin(!isLogin);
@@ -95,7 +96,19 @@ export default function AuthPage() {
     e.preventDefault();
     if (validateForm()) {
       console.log('Form submitted:', formData);
-      alert(`${isLogin ? 'Login' : 'Sign up'} successful for ${formData.role}!`);
+      setShowSuccess(true);
+      // Hide success message after 2 seconds
+      setTimeout(() => {
+        setShowSuccess(false);
+        // Reset form after success
+        setFormData({
+          name: '',
+          email: '',
+          password: '',
+          phone: '',
+          role: 'User'
+        });
+      }, 2000);
     }
   };
 
@@ -111,6 +124,29 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-100 via-emerald-50 to-lime-100 flex items-center justify-center p-4 md:p-8 lg:p-12 relative overflow-hidden">
+      <style jsx>{`
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes checkmark {
+          0% {
+            transform: scale(0);
+          }
+          50% {
+            transform: scale(1.2);
+          }
+          100% {
+            transform: scale(1);
+          }
+        }
+      `}</style>
 
       {/* Main Rectangle Container */}
       <div className="w-full max-w-5xl min-h-[500px] bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden border border-green-200 flex flex-col md:flex-row relative z-10">
@@ -260,6 +296,33 @@ export default function AuthPage() {
           </div>
         </div>
       </div>
+
+      {/* Success Overlay */}
+      {showSuccess && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-white rounded-2xl p-8 flex flex-col items-center transform animate-[slideIn_0.5s_ease-out]">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+              <div className="w-8 h-8 text-green-500 relative">
+                <div className="absolute inset-0 transform animate-[checkmark_0.5s_ease-out]">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                    <path 
+                      d="M20 6L9 17L4 12"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              {isLogin ? 'Sign In' : 'Sign Up'} Successful!
+            </h3>
+            <p className="text-gray-600">
+              Welcome {formData.role}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
